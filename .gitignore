@@ -32,3 +32,8 @@ configs/example/memcheck.cfg
 configs/dram/lowp_sweep.cfg
 .pyenv
 .vscode
+disk-image/packer
+disk-image/spec-2017/cpu2017-1.1.0.iso
+disk-image/spec-2017/spec-2017-image-compact
+disk-image/spec-2017/spec-2017-image
+kernel
