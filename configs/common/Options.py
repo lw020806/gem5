@@ -324,6 +324,24 @@ def addCommonOptions(parser):
                         (if not set, use the default prefetcher of
                         the selected cache)""",
     )
+    parser.add_argument(
+        "--l1i-hwp-flush-interval",
+        default=None,
+        type=str,
+        help="selective flush interval; default 0 represents no flush interval",
+    )
+    parser.add_argument(
+        "--l1d-hwp-flush-interval",
+        default=None,
+        type=str,
+        help="selective flush interval; default 0 represents no flush interval",
+    )
+    parser.add_argument(
+        "--l2-hwp-flush-interval",
+        default=None,
+        type=str,
+        help="selective flush interval; default 0 represents no flush interval",
+    )
     parser.add_argument("--checker", action="store_true")
     parser.add_argument(
         "--cpu-clock",

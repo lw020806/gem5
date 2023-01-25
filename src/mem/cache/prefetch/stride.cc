@@ -101,12 +101,12 @@ Stride::processFlush()
         for (auto it = pcTables.begin(); it != pcTables.end(); it++) {
             auto &pcTable = it->second;
             for (auto entryIt = pcTable.begin(); entryIt != pcTable.end(); entryIt++) {
-                pcTable.invalidate(entryIt);
+                pcTable.invalidate(&(*entryIt));
             }
         }
 
         /* schedule next flushing event */
-        schedule(flushEvent, curTick() + flushInterval)
+        schedule(flushEvent, curTick() + flushInterval);
     }
 }
 

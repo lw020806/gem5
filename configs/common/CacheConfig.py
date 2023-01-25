@@ -56,6 +56,23 @@ def _get_hwp(hwp_option):
     hwpClass = ObjectList.hwp_list.get(hwp_option)
     return hwpClass()
 
+def _get_hwp_flushing(level, options):
+    prefetcher_attr = "{}_hwp_type".format(level)
+    if hasattr(options, prefetcher_attr):
+        hwp_option = getattr(options, prefetcher_attr)
+        if hwp_option == None:
+            return NULL
+        hwpClass = ObjectList.hwp_list.get(hwp_option)
+
+        opts = {}
+        flush_attr = "{}_hwp_flush_interval".format(level)
+        if hasattr(options, flush_attr):
+            opts["flush_interval"] = getattr(options, flush_attr)
+
+        return hwpClass(**opts)
+    else :
+        return NULL
+
 
 def _get_cache_opts(level, options):
     opts = {}
@@ -68,9 +85,10 @@ def _get_cache_opts(level, options):
     if hasattr(options, assoc_attr):
         opts["assoc"] = getattr(options, assoc_attr)
 
-    prefetcher_attr = "{}_hwp_type".format(level)
-    if hasattr(options, prefetcher_attr):
-        opts["prefetcher"] = _get_hwp(getattr(options, prefetcher_attr))
+    # prefetcher_attr = "{}_hwp_type".format(level)
+    # if hasattr(options, prefetcher_attr):
+    #     opts["prefetcher"] = _get_hwp(getattr(options, prefetcher_attr))
+    opts["prefetcher"] = _get_hwp_flushing(level, options)
 
     return opts
 

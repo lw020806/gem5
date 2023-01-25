@@ -20,6 +20,9 @@ then
 elif [[ ${prefetcher_mode} == "enable_pf" ]];
 then
 	pf_argu="--l1d-hwp-type=StridePrefetcher --l2-hwp-type=StridePrefetcher"
+elif [[ ${prefetcher_mode} == "flush_pf" ]];
+then
+	pf_argu="--l1d-hwp-type=StridePrefetcher --l2-hwp-type=StridePrefetcher --l1d-hwp-flush-interval=10us --l2-hwp-flush-interval=10ns"
 else
 	echo "invalid prefetcher flat"
 	exit 1
@@ -28,7 +31,7 @@ fi
 
 GEM5_DIR=/mnt/storage/qiling/gem5
 mkdir -p ${GEM5_DIR}/${OUT_DIR}
-${GEM5_DIR}/build/X86/gem5.opt \
+${GEM5_DIR}/build/X86_flushing/gem5.opt \
 	--outdir=${GEM5_DIR}/${OUT_DIR} \
 	--debug-flags=HWPrefetch \
 ${GEM5_DIR}/configs/example/fs.py \
