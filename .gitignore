@@ -37,3 +37,7 @@ disk-image/spec-2017/cpu2017-1.1.0.iso
 disk-image/spec-2017/spec-2017-image-compact
 disk-image/spec-2017/spec-2017-image
 kernel
+checkpoints
+disk-image/builder.log
+disk-image/spec-2017/spec-2017-*
+
