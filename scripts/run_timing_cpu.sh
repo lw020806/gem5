@@ -4,12 +4,15 @@ num_core=$1
 prefetcher_mode=$2
 max_insts=$3
 ckpt_dir=$4
+OUT_DIR=$5
+
 
 echo "configurations:"
 echo "num_core: ${num_core}"
 echo "prefetcher_mode: ${prefetcher_mode}"
 echo "max_insts: ${max_insts}"
 echo "ckpt_dir: ${ckpt_dir}"
+echo "OUT_DIR: ${OUT_DIR}"
 
 if [[ ${prefetcher_mode} == "disable_pf" ]];
 then
@@ -24,12 +27,12 @@ fi
 
 
 GEM5_DIR=/mnt/storage/qiling/gem5
-mkdir -p ${GEM5_DIR}/results/w-prefetcher/
+mkdir -p ${GEM5_DIR}/${OUT_DIR}
 ${GEM5_DIR}/build/X86/gem5.opt \
-	--outdir=${GEM5_DIR}/results/w-prefetcher/ \
+	--outdir=${GEM5_DIR}/${OUT_DIR} \
 	--debug-flags=HWPrefetch \
 ${GEM5_DIR}/configs/example/fs.py \
-	--num-cpus=${num_core}
+	--num-cpus=${num_core} \
 	--cpu-type=X86TimingSimpleCPU \
 	--cpu-clock=2.6GHz \
 	--caches --l2cache \
@@ -44,6 +47,6 @@ ${GEM5_DIR}/configs/example/fs.py \
 	--maxinsts=${max_insts} \
 	--script=${GEM5_DIR}/scripts/readfile \
 	--restore-with-cpu=X86KvmCPU \
-	--checkpoint-restore=1 \
-	--checkpoint-dir=${GEM5_DIR}/ckpt_dir \
+	--checkpoint-restore=3 \
+	--checkpoint-dir=${GEM5_DIR}/${ckpt_dir} \
 	${pf_argu} \

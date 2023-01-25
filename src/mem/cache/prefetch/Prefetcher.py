@@ -205,6 +205,10 @@ class StridePrefetcher(QueuedPrefetcher):
         RandomRP(), "Replacement policy of the PC table"
     )
 
+    flush_interval = Param.Latency(
+        "0us", "Interval of selective flushing; default 0 -- no flushing"
+    )
+
 
 class TaggedPrefetcher(QueuedPrefetcher):
     type = "TaggedPrefetcher"

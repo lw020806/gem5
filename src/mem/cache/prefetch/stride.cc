@@ -86,8 +86,35 @@ Stride::Stride(const StridePrefetcherParams &p)
     useRequestorId(p.use_requestor_id),
     degree(p.degree),
     pcTableInfo(p.table_assoc, p.table_entries, p.table_indexing_policy,
-        p.table_replacement_policy)
+        p.table_replacement_policy),
+    flushInterval(p.flush_interval),
+    flushEvent([this]{processFlush();}, name())
 {
+}
+
+void
+Stride::processFlush()
+{
+    if (flushInterval != 0) {
+        DPRINTF(HWPrefetch, "Selective flushing!\n");
+        /* do flushing work */
+        for (auto it = pcTables.begin(); it != pcTables.end(); it++) {
+            auto &pcTable = it->second;
+            for (auto entryIt = pcTable.begin(); entryIt != pcTable.end(); entryIt++) {
+                pcTable.invalidate(entryIt);
+            }
+        }
+
+        /* schedule next flushing event */
+        schedule(flushEvent, curTick() + flushInterval)
+    }
+}
+
+void
+Stride::startup()
+{
+    if (flushInterval != 0)
+        schedule(flushEvent, curTick() + flushInterval);
 }
 
 Stride::PCTable*

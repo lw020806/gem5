@@ -59,6 +59,7 @@
 #include "mem/cache/tags/indexing_policies/set_associative.hh"
 #include "mem/packet.hh"
 #include "params/StridePrefetcherHashedSetAssociative.hh"
+#include "sim/sim_object.hh"
 
 namespace gem5
 {
@@ -158,8 +159,13 @@ class Stride : public Queued
      */
     PCTable* allocateNewContext(int context);
 
+    const Tick flushInterval;
+    void processFlush();
+    EventFunctionWrapper flushEvent;
+
   public:
     Stride(const StridePrefetcherParams &p);
+    void startup();
 
     void calculatePrefetch(const PrefetchInfo &pfi,
                            std::vector<AddrPriority> &addresses) override;
