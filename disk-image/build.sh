@@ -7,6 +7,6 @@ if [ ! -f ./packer ]; then
 fi
 
 export PACKER_LOG=1
-export PACKER_LOG_PATH="/mnt/storage/qiling/log"
+export PACKER_LOG_PATH="/mnt/storage/qiling/gem5/disk-image/builder.log"
 ./packer validate spec-2017/spec-2017.json
 ./packer build spec-2017/spec-2017.json

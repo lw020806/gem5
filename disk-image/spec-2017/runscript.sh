@@ -14,23 +14,23 @@ echo "Done reading workloads"
 if [ -s workloads ]; then
     # if the file is not empty, run spec with the parameters
     echo "Workload detected"
-    echo "Reset stats"
 
     read -r workload size m5filespath < workloads
 
-    m5 exit
+    # m5 checkpoint
 
     # run the commands
+    # m5 resetstats
     runcpu --size $size --iterations 1 --config myconfig.x86.cfg --define gcc_dir="/usr" --noreportable --nobuild $workload
-    # runcpu --size $size --iterations 1 --config myconfig.x86.cfg --define gcc_dir="/usr" --noreportable --action onlyrun $workload
     m5 exit
+    # runcpu --size $size --iterations 1 --config myconfig.x86.cfg --define gcc_dir="/usr" --noreportable --action onlyrun $workload
 
     # copy the SPEC result files to host
-    for filepath in /home/gem5/spec2017/result/*; do
-        filename=$(basename $filepath)
-        m5 writefile $filepath $m5filespath/$filename
-    done
-    m5 exit
+    # for filepath in /home/gem5/spec2017/result/*; do
+        # filename=$(basename $filepath)
+        # m5 writefile $filepath $m5filespath/$filename
+    # done
+    # m5 exit
 else
     echo "Couldn't find any workload"
     m5 exit

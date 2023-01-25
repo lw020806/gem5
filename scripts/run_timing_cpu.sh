@@ -6,73 +6,28 @@ size=$3
 bench=$4
 nnodes=$5
 wb_dc=$6
-mode=-1
 
-if [[ "$protocol" == "moesi-prime" ]];
-then
-    mode=0
-elif [[ "$protocol" == "moesi" ]];
-then
-    mode=1
-elif [[ "$protocol" == "mesi" ]];
-then
-	mode=2
-else
-	echo "Invalid protocol: ${protocol}, exiting"
-	exit 1
-fi
 
-if [[ ${nnodes} != 2 && ${nnodes} != 4 && ${nnodes} != 8 ]];
-then
-	echo "Invalid nnodes: ${nnodes}, exiting"
-	exit 1
-fi
-
-if [[ "$size" != "simsmall" && "$size" != "simmedium" && "$size" != "simlarge" ]];
-then
-	echo "Invalid input size: ${size}, exiting"
-	exit 1
-fi
-
-if [[ ${wb_dc} != 0 && ${wb_dc} != 1 ]];
-then
-	echo "Invalid wb_dc: ${wb_dc}, exiting"
-	exit 1
-fi
-
-l2size=$(( 19456/${nnodes} ))
-# always have 2048 sets, adjust ways a la slice mapping func
-l2assoc=$(( 32 ))
-
-dcsize=$(( 16 * 1024 * 8/${nnodes} ))
-dcassoc=$(( 32 ))
-
-GEM5_DIR=/path/to/gem5
-mkdir -p ${GEM5_DIR}/results/${label}/${protocol}-${nnodes}node-${size}-wb${wb_dc}/
-${GEM5_DIR}/build/X86_MOESI-prime/gem5.fast \
-    --outdir=${GEM5_DIR}/results/${label}/${protocol}-${nnodes}node-${size}-wb${wb_dc}/${bench}/ \
-    ${GEM5_DIR}/configs/example/moesi-prime_fs.py \
-	--checkpoint-dir=/path/to/checkpoint \
-	-r 1 \
+GEM5_DIR=/mnt/storage/qiling/gem5
+mkdir -p ${GEM5_DIR}/results/w-prefetcher/
+${GEM5_DIR}/build/X86/gem5.opt --outdir=${GEM5_DIR}/results/w-prefetcher/ \
+${GEM5_DIR}/configs/example/fs.py \
 	-n 8 \
+	--cpu-type=X86TimingSimpleCPU \
 	--cpu-clock=2.6GHz \
-	--ruby \
-	--wb-dc=${wb_dc} \
-	--page-policy=close_adaptive \
-	--addr-mapping=RoCoRaBaCh \
-	--mode=${mode} \
-	--dir-cache-size=${dcsize} \
-	--dir-cache-assoc=${dcassoc} \
-	--num-dirs=${nnodes} \
+	--caches --l2cache \
 	--l1i_size 32kB \
 	--l1i_assoc 8 \
 	--l1d_size 32kB \
 	--l1d_assoc 8 \
-	--l2_size ${l2size}kB \
-	--l2_assoc ${l2assoc} \
-	--num-l2caches=${nnodes} \
-	--cpu-type=TimingSimpleCPU \
-	--kernel=/path/to/kernel \
-	--disk-image=/path/to/image \
-	--mem-type=DDR4_2400_16x4_${nnodes}node_16 \
-	--mem-size=16GB
+	--l1d-hwp-type=StridePrefetcher \
+	--l2-hwp-type=StridePrefetcher \
+	--kernel=${GEM5_DIR}/kernel/x86-linux-kernel-4.19.83 \
+	--disk-image=${GEM5_DIR}/disk-image/spec-2017/spec-2017-image-foto/spec-2017 \
+	--mem-type=DDR4_2400_16x4 \
+	--mem-size=16GB \
+	--maxinsts=1000000000 \
+	--script=${GEM5_DIR}/scripts/readfile \
+	--restore-with-cpu=X86KvmCPU \
+	--checkpoint-restore=1 \
+	--checkpoint-dir=${GEM5_DIR}/checkpoints/foto/ \
