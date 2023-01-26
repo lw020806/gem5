@@ -607,6 +607,13 @@ def addCommonOptions(parser):
         help="restore from checkpoint <N>",
     )
     parser.add_argument(
+        "--fast-forward-after-restore",
+        action="store",
+        type=str,
+        default=None,
+        help="fast forward <N> instructions after restoring from checkpoint",
+    )
+    parser.add_argument(
         "--checkpoint-at-end",
         action="store_true",
         help="take a checkpoint at end of run",

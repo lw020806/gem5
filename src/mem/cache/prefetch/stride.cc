@@ -100,8 +100,8 @@ Stride::processFlush()
         for (auto it = pcTables.begin(); it != pcTables.end(); it++) {
             auto &pcTable = it->second;
             for (auto entryIt = pcTable.begin(); entryIt != pcTable.end(); entryIt++) {
-                # pcTable.invalidate(&(*entryIt));
-                entryIt->invalidate();
+                pcTable.invalidate(&(*entryIt));
+                // entryIt->invalidate();
             }
         }
 

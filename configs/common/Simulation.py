@@ -515,6 +515,8 @@ def run(options, root, testsys, cpu_class):
         for i in range(np):
             if options.fast_forward:
                 testsys.cpu[i].max_insts_any_thread = int(options.fast_forward)
+            if options.fast_forward_after_restore:
+                testsys.cpu[i].max_insts_any_thread = int(options.fast_forward_after_restore)
             switch_cpus[i].system = testsys
             switch_cpus[i].workload = testsys.cpu[i].workload
             switch_cpus[i].clk_domain = testsys.cpu[i].clk_domain
@@ -739,6 +741,12 @@ def run(options, root, testsys, cpu_class):
                 % str(testsys.cpu[0].max_insts_any_thread)
             )
             exit_event = m5.simulate()
+        elif cpu_class and options.fast_forward_after_restore:
+            print(
+                "Switch at instruction count after checkpoint:%s"
+                % str(testsys.cpu[0].max_insts_any_thread)
+            )
+            exit_event = m5.simulate()
         else:
             print("Switch at curTick count:%s" % str(10000))
             exit_event = m5.simulate(10000)
@@ -793,7 +801,7 @@ def run(options, root, testsys, cpu_class):
         restoreSimpointCheckpoint()
 
     else:
-        if options.fast_forward:
+        if options.fast_forward or options.fast_forward_after_restore:
             m5.stats.reset()
         print("**** REAL SIMULATION ****")
 

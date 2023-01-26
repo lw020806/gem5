@@ -338,6 +338,7 @@ args = parser.parse_args()
 # Match the memories with the CPUs, based on the options for the test system
 TestMemClass = Simulation.setMemClass(args)
 
+# setup boot manager
 if args.benchmark:
     try:
         bm = Benchmarks[args.benchmark]

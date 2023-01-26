@@ -9,15 +9,13 @@
 
 cd /home/gem5/spec2017
 source shrc
+m5 checkpoint
+
 m5 readfile > workloads
-echo "Done reading workloads"
 if [ -s workloads ]; then
     # if the file is not empty, run spec with the parameters
     echo "Workload detected"
-
     read -r workload size m5filespath < workloads
-
-    m5 checkpoint
 
     # run the commands
     runcpu --size $size --iterations 1 --config myconfig.x86.cfg --define gcc_dir="/usr" --noreportable --nobuild $workload

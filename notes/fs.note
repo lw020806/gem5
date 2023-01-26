@@ -1,0 +1,102 @@
+(TestClass, test_mem_mode, FutureClass) = setCPUClass(args)
+	# restoring from checkpoint / fast forwarding with one cpu, then actual simulation another cpu
+	TestClass, mem_mode = getCPUClass(option.cpu_type)
+		# which return cpu_type class name, and corresponding mem_mode
+	FuturnClass = NONE
+
+	if checkpoint_restore :
+		if restore_with_cpu != cpu_type :
+			# first restore with: restore_with_cpu
+			# then simulate with: cpu_type
+			FuturnClass = TestClass
+			TestClass, mem_mode = getCPUClass(option.restore_with_cpu)
+		else :
+			# do nothing
+			# first restore with: cpu_type
+			# then simulate with: cpu_type
+	elif fast_forward:
+		# first restore with: AtomicSimpleCPU, mem_mode: atomic
+		# then simulate with: cpu_type
+		FutureClass = TestClass
+		TestClass, mem_mode = (AtomicSimpleCPU, "atomic")
+	
+	if test_mem_mode == "atomic" && ruby :
+		test_mem_mode = "atomic_noncaching"
+
+	return (TestClass, test_mem_mode, FutureClass)
+
+test_sys = build_test_system(np)
+	test_sys = makeLinuxX86System(...)
+	# set up kernel, readfile, 
+	test_sys.cpu = [
+		TestClass(clk_domain, cpu_id) for i in range(#processor)
+	]
+
+	if not ruby:
+		if caches or l2cache:
+			# setup IO cache and connect ports
+		for cpu :
+			if not kvm:  set up branch predictor
+		CacheConfig.config_cache(args, test_sys)
+		MemConfig.config_mem(args, test_sys)
+	if (TestClass or FuturnClass) == kvm :
+		# detach KVMCpus from child objects (caches, ...)
+		# make eventq_index of child objects different from that of KVMCpus
+	
+Simulation.run(args, root, test_sys, FutureClass)
+	cptdir = (options.checkpoint_dir or outdir or current working directory)
+	np, switch_cpus = NONE
+	if prog_interval :
+		testsys.cpu[:].progress_interval = prog_interval	# TestClass
+	if maxinsts :
+		testsys.cpu[:].max_insts_any_thread = maxinsts		# TestClass
+	if FutureClass :
+		# initialize cpus to switch to
+		switch_cpus = [
+			cpu_class(switched_out = True, cpu_id) for i in range(np)
+		]
+		for i in range(np) :
+			if fast_forward :
+				testsys.cpu[:].max_insts_any_thread = fast_forward		# TestClass
+			if fast_forward_after_restore :
+				testsys.cpu[:].max_insts_any_thread = fast_forward_after_restore	# TestClass
+			# FutureClass.settings = TestClass.settings
+			switch_cpus[:].settings = testsys.cpu[:].settings
+			if maxinsts :
+				# setup FuturnClass.maxinsts for real simulation
+				switch_cpus[:].max_insts_any_thread = maxinsts
+		# add these FutureClass cpus to testsys
+		testsys.switch_cpus = switch_cpus
+		switch_cpu_list = [(testsys.cpu[i], switch_cpus[i]) for i in range(np)]
+	
+	if checkpoint_restore :
+		cpt_starttick, checkpoint_dir = fintCptDir(options, cptdir, testsys)
+	m5.instantiate(checkpoint_dir)
+
+	# setup max tick(time)
+	maxtick = min([maxtick_absolute, maxtick_relative, maxtick_from_maxtime])
+
+	if standard_switch or FutureClass :
+		if standard_switch :
+			...
+		elif FutureClass and fast_forward :
+			# simulate till instruction count reaches fast_forward
+			print("Will switch at instruction count: %s", TestClass.max_insts_any_thread)
+			m5.simulate()
+		elif FutureClass and fast_forward_after_restore :
+			# simulate till instruction count reaches fast_forward
+			print("Will switch at instruction count: %s", TestClass.max_insts_any_thread)
+			m5.simulate()
+		else FutureClass and !fast_forward :
+			# first restore from checkpoint with TestClass, which simulate only 10000 ticks
+			# then switch to FutureClass and do real simulation
+			print("(Will) Switch at tick count %s", 10000)
+			m5.simulate(10000)
+		m5.switchCpus(testsys, switch_cpu_list)
+
+	if fast_forward or fast_forward_after_restore:
+		m5.stats.reset()
+	print("*** REAL SIMULATION ***")
+
+	# do real simulation, also able to handle checkpoints
+	benchCheckpoints(options, maxtick, cptdir)
