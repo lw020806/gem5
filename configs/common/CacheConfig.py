@@ -68,6 +68,18 @@ def _get_hwp_flushing(level, options):
         flush_attr = "{}_hwp_flush_interval".format(level)
         if hasattr(options, flush_attr):
             opts["flush_interval"] = getattr(options, flush_attr)
+        if hasattr(options, "hwp_counter_bits"):
+            opts["confidence_counter_bits"] = getattr(options, "hwp_counter_bits")
+        if hasattr(options, "hwp_initial_confidence"):
+            opts["initial_confidence"] = getattr(options, "hwp_initial_confidence")
+        if hasattr(options, "hwp_confidence_threshold"):
+            opts["confidence_threshold"] = getattr(options, "hwp_confidence_threshold")
+        if hasattr(options, "hwp_degree"):
+            opts["degree"] = getattr(options, "hwp_degree")
+        if hasattr(options, "hwp_table_assoc"):
+            opts["table_assoc"] = getattr(options, "hwp_table_assoc")
+        if hasattr(options, "hwp_table_entries"):
+            opts["table_entries"] = getattr(options, "hwp_table_entries")
 
         return hwpClass(**opts)
     else :

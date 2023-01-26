@@ -17,10 +17,9 @@ if [ -s workloads ]; then
 
     read -r workload size m5filespath < workloads
 
-    # m5 checkpoint
+    m5 checkpoint
 
     # run the commands
-    # m5 resetstats
     runcpu --size $size --iterations 1 --config myconfig.x86.cfg --define gcc_dir="/usr" --noreportable --nobuild $workload
     m5 exit
     # runcpu --size $size --iterations 1 --config myconfig.x86.cfg --define gcc_dir="/usr" --noreportable --action onlyrun $workload

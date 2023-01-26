@@ -96,12 +96,12 @@ void
 Stride::processFlush()
 {
     if (flushInterval != 0) {
-        DPRINTF(HWPrefetch, "Selective flushing!\n");
         /* do flushing work */
         for (auto it = pcTables.begin(); it != pcTables.end(); it++) {
             auto &pcTable = it->second;
             for (auto entryIt = pcTable.begin(); entryIt != pcTable.end(); entryIt++) {
-                pcTable.invalidate(&(*entryIt));
+                # pcTable.invalidate(&(*entryIt));
+                entryIt->invalidate();
             }
         }
 
@@ -113,8 +113,12 @@ Stride::processFlush()
 void
 Stride::startup()
 {
-    if (flushInterval != 0)
+    if (flushInterval != 0) {
+        DPRINTF(HWPrefetch, "Selective flushing enabled. \n");
         schedule(flushEvent, curTick() + flushInterval);
+    } else {
+        DPRINTF(HWPrefetch, "Selective flushing disabled. \n");
+    }
 }
 
 Stride::PCTable*

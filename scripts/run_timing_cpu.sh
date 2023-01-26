@@ -1,14 +1,13 @@
 #!/bin/bash
+GEM5_DIR=/mnt/storage/qiling/gem5
 
-num_core=$1
-prefetcher_mode=$2
-max_insts=$3
-ckpt_dir=$4
-OUT_DIR=$5
-
+max_insts=$1
+ckpt_dir=$2
+OUT_DIR=$3
+prefetcher_mode=$4
+echo "649.fotonik3d_s ref nullptr" > ${GEM5_DIR}/scripts/readfile_timing
 
 echo "configurations:"
-echo "num_core: ${num_core}"
 echo "prefetcher_mode: ${prefetcher_mode}"
 echo "max_insts: ${max_insts}"
 echo "ckpt_dir: ${ckpt_dir}"
@@ -19,23 +18,21 @@ then
 	pf_argu=""
 elif [[ ${prefetcher_mode} == "enable_pf" ]];
 then
-	pf_argu="--l1d-hwp-type=StridePrefetcher --l2-hwp-type=StridePrefetcher"
+	pf_argu="--l1d-hwp-type=StridePrefetcher --hwp-counter-bits=2 --hwp-initial-confidence=1 --hwp-confidence-threshold=50 --hwp-degree=4 --hwp-table-assoc=32 --hwp-table-entries=32"
 elif [[ ${prefetcher_mode} == "flush_pf" ]];
 then
-	pf_argu="--l1d-hwp-type=StridePrefetcher --l2-hwp-type=StridePrefetcher --l1d-hwp-flush-interval=10us --l2-hwp-flush-interval=10ns"
+	pf_argu="--l1d-hwp-type=StridePrefetcher --l1d-hwp-flush-interval=10us --hwp-counter-bits=2 --hwp-initial-confidence=1 --hwp-confidence-threshold=50 --hwp-degree=4 --hwp-table-assoc=32 --hwp-table-entries=32"
 else
 	echo "invalid prefetcher flat"
 	exit 1
 fi
 
 
-GEM5_DIR=/mnt/storage/qiling/gem5
 mkdir -p ${GEM5_DIR}/${OUT_DIR}
 ${GEM5_DIR}/build/X86_flushing/gem5.opt \
 	--outdir=${GEM5_DIR}/${OUT_DIR} \
-	--debug-flags=HWPrefetch \
 ${GEM5_DIR}/configs/example/fs.py \
-	--num-cpus=${num_core} \
+	--num-cpus=2 \
 	--cpu-type=X86TimingSimpleCPU \
 	--cpu-clock=2.6GHz \
 	--caches --l2cache \
@@ -48,7 +45,7 @@ ${GEM5_DIR}/configs/example/fs.py \
 	--mem-type=DDR4_2400_16x4 \
 	--mem-size=16GB \
 	--maxinsts=${max_insts} \
-	--script=${GEM5_DIR}/scripts/readfile \
+	--script=${GEM5_DIR}/scripts/readfile_timing \
 	--restore-with-cpu=X86KvmCPU \
 	--checkpoint-restore=3 \
 	--checkpoint-dir=${GEM5_DIR}/${ckpt_dir} \

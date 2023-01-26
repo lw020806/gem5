@@ -326,21 +326,54 @@ def addCommonOptions(parser):
     )
     parser.add_argument(
         "--l1i-hwp-flush-interval",
-        default=None,
+        default="0us",
         type=str,
         help="selective flush interval; default 0 represents no flush interval",
     )
     parser.add_argument(
         "--l1d-hwp-flush-interval",
-        default=None,
+        default="0us",
         type=str,
         help="selective flush interval; default 0 represents no flush interval",
     )
     parser.add_argument(
         "--l2-hwp-flush-interval",
-        default=None,
+        default="0us",
         type=str,
         help="selective flush interval; default 0 represents no flush interval",
+    )
+    parser.add_argument(
+        "--hwp-counter-bits",
+        default=2,
+        type=int,
+        help="confidence bit for stride prefetcher",
+    )
+    parser.add_argument(
+        "--hwp-initial-confidence",
+        default=1,
+        type=int,
+        help="initial confidence for stride prefetcher",
+    )
+    parser.add_argument(
+        "--hwp-confidence-threshold",
+        default=50,
+        help="confidence threshold for stride prefetcher",
+    )
+    parser.add_argument(
+        "--hwp-degree",
+        default=4,
+        type=int,
+        help="prefetch degree for stride prefetcher",
+    )
+    parser.add_argument(
+        "--hwp-table-assoc",
+        default=32,
+        help="pc table associativiy for stride prefetcher",
+    )
+    parser.add_argument(
+        "--hwp-table-entries",
+        default=32,
+        help="confidence threshold for stride prefetcher",
     )
     parser.add_argument("--checker", action="store_true")
     parser.add_argument(
