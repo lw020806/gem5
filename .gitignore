@@ -40,4 +40,5 @@ kernel
 checkpoints
 disk-image/builder.log
 disk-image/spec-2017/spec-2017-*
+log
 

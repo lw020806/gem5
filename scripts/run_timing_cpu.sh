@@ -5,7 +5,8 @@ CKPT_DIR=checkpoints/boot
 OUT_DIR=$1
 benchmark=$2
 max_insts=$3
-prefetcher_mode=$4
+fast_forwarding=$4
+prefetcher_mode=$5
 
 mkdir -p ${GEM5_DIR}/${OUT_DIR}
 echo "${benchmark} ref nullptr" > ${GEM5_DIR}/${OUT_DIR}/readfile
@@ -15,10 +16,10 @@ then
 	pf_argu=""
 elif [[ ${prefetcher_mode} == "enable_pf" ]];
 then
-	pf_argu="--l1d-hwp-type=StridePrefetcher --hwp-counter-bits=2 --hwp-initial-confidence=1 --hwp-confidence-threshold=50 --hwp-degree=4 --hwp-table-assoc=32 --hwp-table-entries=32"
+	pf_argu="--l1d-hwp-type=StridePrefetcher --hwp-counter-bits=2 --hwp-initial-confidence=1 --hwp-confidence-threshold=50 --hwp-degree=4 --hwp-table-assoc=24 --hwp-table-entries=24"
 elif [[ ${prefetcher_mode} == "flush_pf" ]];
 then
-	pf_argu="--l1d-hwp-type=StridePrefetcher --l1d-hwp-flush-interval=10us --hwp-counter-bits=2 --hwp-initial-confidence=1 --hwp-confidence-threshold=50 --hwp-degree=4 --hwp-table-assoc=32 --hwp-table-entries=32"
+	pf_argu="--l1d-hwp-type=StridePrefetcher --l1d-hwp-flush-interval=10us --hwp-counter-bits=2 --hwp-initial-confidence=1 --hwp-confidence-threshold=50 --hwp-degree=4 --hwp-table-assoc=24 --hwp-table-entries=24"
 else
 	echo "invalid prefetcher flag"
 	exit 1
@@ -42,13 +43,15 @@ ${GEM5_DIR}/configs/example/fs.py \
 	--l1i_assoc 8 \
 	--l1d_size 32kB \
 	--l1d_assoc 8 \
+	--l2_size 4MB \
+	--l2_assoc 32 \
 	${pf_argu} \
 	--mem-type=DDR4_2400_16x4 \
 	--mem-size=16GB \
 	--checkpoint-dir=${GEM5_DIR}/${CKPT_DIR} \
 	--checkpoint-restore=1 \
 	--restore-with-cpu=X86KvmCPU \
-	--fast-forward-after-restore=500000000000 \
+	--fast-forward-after-restore=${fast_forwarding} \
 	--maxinsts=${max_insts} \
 
 echo -n `date "+%T"`
